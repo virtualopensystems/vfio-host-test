@@ -51,6 +51,7 @@ int main(int argc, const char **argv)
 
 	struct vfio_iommu_type1_dma_map dma_map;
 	struct vfio_dev_spec dev;
+	init_vfio_dev_spec(&dev);
 
 	char *chr_group = NULL, *group_addr = NULL;
 	char vfio_base[] = VFIO_BASE_PATH;

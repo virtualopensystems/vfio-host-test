@@ -87,6 +87,12 @@ void init_vfio_info(struct vfio_info *info)
 	info->iommu_info.argsz = sizeof(struct vfio_iommu_type1_info);
 }
 
+void init_vfio_dev_spec(struct vfio_dev_spec *dev)
+{
+	dev->regions = NULL;
+	dev->irqs = NULL;
+}
+
 int is_group_viable(struct vfio_info *info)
 {
 	ioctl(info->group, VFIO_GROUP_GET_STATUS, &info->group_status);

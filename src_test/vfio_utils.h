@@ -53,6 +53,8 @@ bool vfio_is_amba_device(uint32_t *base, uint32_t size);
 
 void init_vfio_info(struct vfio_info *info);
 
+void init_vfio_dev_spec(struct vfio_dev_spec *dev);
+
 int is_group_viable(struct vfio_info *info);
 
 /* return 1 on fail */
