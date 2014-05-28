@@ -19,7 +19,7 @@
 #define VFIO_BASE_PATH "/dev/vfio/"
 #define VFIO_CONTAINER_PATH  "/dev/vfio/vfio"
 
-#define VFIO_DMA_MAP_FLAG_EXEC (1 << 2)
+#define VFIO_DMA_MAP_FLAG_NOEXEC (1 << 2)
 
 struct vfio_dev_spec {
 	char *name;

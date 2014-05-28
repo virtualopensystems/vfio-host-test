@@ -131,8 +131,7 @@ int dma_do_map(struct vfio_info *info, struct vfio_iommu_type1_dma_map *map,
 	map->vaddr = (uintptr_t)mmap(0, size, PROT_READ | PROT_WRITE,
 			     MAP_PRIVATE | MAP_ANONYMOUS, 0, 0);
 	map->iova = iova;
-	map->flags = VFIO_DMA_MAP_FLAG_READ | VFIO_DMA_MAP_FLAG_WRITE |
-						VFIO_DMA_MAP_FLAG_EXEC;
+	map->flags = VFIO_DMA_MAP_FLAG_READ | VFIO_DMA_MAP_FLAG_WRITE;
 	map->size = size;
 
 	return ioctl(info->container, VFIO_IOMMU_MAP_DMA, map);
