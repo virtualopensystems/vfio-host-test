@@ -1,28 +1,15 @@
 #include "pl330_vfio_driver/pl330_vfio.h"
 
-/*#include <linux/vfio.h>*/
-/*#include <linux/types.h>*/
-
-/*#include <stdio.h>*/
-/*#include <stdlib.h>*/
-/*#include <errno.h>*/
-
-/*#include <sys/fcntl.h>*/
-/*#include <sys/mman.h>*/
-/*#include <sys/eventfd.h>*/
-
-/*#include <time.h>*/
-
-/*#define IRQ*/
-
 #include "../vfio_utils.h"
+
+static bool completed = false;
 
 void done_callback(void *user_data)
 {
-	printf("done!\n");
+	completed = true;
 
 	char *ptr = (char *)user_data;
-	printf("the message is: %s\n", ptr);
+	/*printf("the message is: %s\n", ptr);*/
 }
 
 int main(int argc, char **argv)
@@ -112,7 +99,7 @@ int main(int argc, char **argv)
 
 	if (base_regs != MAP_FAILED)
 		printf("register area mapped successfully\n");
-	
+
 	populate_device_irqs(&dev);
 
 	int irqfd = eventfd(0, EFD_NONBLOCK | EFD_CLOEXEC);
@@ -124,7 +111,7 @@ int main(int argc, char **argv)
 
 	struct vfio_irq_info *irq = &dev.irqs[0];
 	if (vfio_irqfd_init(dev.device_fd, irq->index, irqfd)) {
-		printf("error while settion IRQ num.%d\n",
+		printf("error while section IRQ num.%d\n",
 					      irq->index);
 
 		goto error;
@@ -145,8 +132,6 @@ int main(int argc, char **argv)
 	for(c = 0; c < tot; c++) {
 		src_ptr[c] = rand();
 	}
-
-	printf("start thread\n");
 
 	// irq handler after setting up irqs
 	pl330_vfio_start_irq_handler();
@@ -177,11 +162,25 @@ int main(int argc, char **argv)
 	pl330_vfio_submit_req((uchar *)((uintptr_t)dma_map_inst.vaddr), dma_map_inst.iova,
 								&config);
 
-	for(c = 0; c < tot; c++) {
-		if(src_ptr[c] != dst_ptr[c]) {
-			printf("test failed! - %d - 0x%x - 0x%x\n", c, src_ptr[c], dst_ptr[c]);
+	/* sleep waiting for the copy being completed */
+	sleep(3);
+
+	if (completed) {
+		for(c = 0; c < tot; c++) {
+			if(src_ptr[c] != dst_ptr[c]) {
+				printf("test failed! Source and destination don't match.\n");
+				goto error;
+			}
 		}
+	} else {
+		printf("Error, the controller hasn't notified yet the completion"
+							       "of the copy.\n");
+		goto error;
 	}
+
+	printf("------------------------------\n");
+	printf("| test completed successfully |\n");
+	printf("------------------------------\n");
 
 	pl330_vfio_reset();
 
