@@ -418,7 +418,7 @@ static void pl330_vfio_dma_map_init(struct vfio_iommu_type1_dma_map *map,
 						u64 iova, u64 size)
 {
 	map->argsz = sizeof(map);
-	map->vaddr = (u64)mmap(NULL, size, PROT_READ | PROT_WRITE,
+	map->vaddr = (uintptr_t)mmap(NULL, size, PROT_READ | PROT_WRITE,
 			MAP_PRIVATE | MAP_ANONYMOUS, 0, 0);
 	map->size = size;
 	map->iova = iova;
