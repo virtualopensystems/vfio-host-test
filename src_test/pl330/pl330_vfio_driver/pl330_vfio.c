@@ -802,7 +802,6 @@ static void stop_thread(uint id)
 		case STOPPED:
 		case KILLING:
 		case COMPLETING:
-			printf("thread %d already stopped\n", id);
 			// nothing to do
 			return;
 		default:
