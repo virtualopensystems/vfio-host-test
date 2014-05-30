@@ -88,6 +88,7 @@ if [ ! -f $test_bin ]; then
 fi
 
 TEST_IRQ=0
+ONLY_SPEC_TEST=0
 for key in "$@"
 do
     case $key in
@@ -95,11 +96,15 @@ do
             TEST_IRQ=1
             shift
             ;;
+        -s|--only-specific)
+            ONLY_SPEC_TEST=1
+            shift
+            ;;
         --default)
             shift
             ;;
         *)
-            echo `basename $0` "[-i|--test-irq]"
+            echo `basename $0` "[-i|--test-irq][-s|--only-specific]"
             exit 0
             ;;
     esac
@@ -166,19 +171,22 @@ if [ $? -ne 0 ]; then
 fi
 
 echo -e '\n'
-echo ==================== begin test =====================
-echo testing device: $device\; IOMMU group: $iommu_group\; bus: $bus
 
-echo ------------------ C code ---------------------------
-$test_bin "$device" "$iommu_group" "$TEST_IRQ" "$bus"
+if [ $ONLY_SPEC_TEST -ne 1 ]; then
+    echo ==================== begin test =====================
+    echo testing device: $device\; IOMMU group: $iommu_group\; bus: $bus
 
-if [ $? -ne 0 ]; then
-    echo ----------------- end C code -----------------------
-    echo some errors occurred
-else
-    echo -e '\n'
-    echo ----------------- end C code -----------------------
-    echo test completed successfully
+    echo ------------------ C code ---------------------------
+    $test_bin "$device" "$iommu_group" "$TEST_IRQ" "$bus"
+
+    if [ $? -ne 0 ]; then
+        echo ----------------- end C code -----------------------
+        echo some errors occurred
+    else
+        echo -e '\n'
+        echo ----------------- end C code -----------------------
+        echo test completed successfully
+    fi
 fi
 
 echo ============== device specifid test =================
